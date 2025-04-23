@@ -20,7 +20,7 @@ public struct ASN1Identifier {
     /// The class of the tag.
     public var tagClass: TagClass
 
-    @inlinable
+    
     var _shortForm: UInt8? {
         // An ASN.1 identifier can be encoded in short form iff the tag number is strictly
         // less than 0x1f.
@@ -38,7 +38,7 @@ public struct ASN1Identifier {
         case contextSpecific
         case `private`
 
-        @inlinable
+        
         init(topByteInWireFormat topByte: UInt8) {
             switch topByte >> 6 {
             case 0x00:
@@ -54,7 +54,7 @@ public struct ASN1Identifier {
             }
         }
 
-        @inlinable
+        
         var _topByteFlags: UInt8 {
             switch self {
             case .universal:
@@ -69,7 +69,7 @@ public struct ASN1Identifier {
         }
     }
 
-    @inlinable
+    
     init(shortIdentifier: UInt8) {
         precondition(shortIdentifier & 0x1F != 0x1F)
         self.tagClass = TagClass(topByteInWireFormat: shortIdentifier)
@@ -81,7 +81,7 @@ public struct ASN1Identifier {
     /// - parameters:
     ///     - number: The tag number.
     ///     - tagClass: The class of the ASN.1 tag.
-    @inlinable
+    
     public init(tagWithNumber number: UInt, tagClass: TagClass) {
         self.tagNumber = number
         self.tagClass = tagClass
@@ -161,14 +161,14 @@ extension ASN1Identifier: Hashable {}
 extension ASN1Identifier: Sendable {}
 
 extension ASN1Identifier: CustomStringConvertible {
-    @inlinable
+    
     public var description: String {
         return "ASN1Identifier(tagNumber: \(self.tagNumber), tagClass: \(self.tagClass))"
     }
 }
 
 extension Array where Element == UInt8 {
-    @inlinable
+    
     mutating func writeIdentifier(_ identifier: ASN1Identifier, constructed: Bool) {
         if var shortForm = identifier._shortForm {
             if constructed {
