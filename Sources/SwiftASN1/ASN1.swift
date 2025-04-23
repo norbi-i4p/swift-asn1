@@ -28,28 +28,28 @@ extension ASN1 {
 }
 
 extension ASN1.EncodingRules {
-    @inlinable
+    
     var indefiniteLengthAllowed: Bool { self == .basic }
 
-    @inlinable
+    
     var nonMinimalEncodedLengthsAllowed: Bool { self == .basic }
 
-    @inlinable
+    
     var constructedBitStringAllowed: Bool { self == .basic }
 
-    @inlinable
+    
     var relaxedTimestampsAllowed: Bool { self == .basic }
 
-    @inlinable
+    
     var defaultEncodableSequenceAllowed: Bool { self == .basic }
 
-    @inlinable
+    
     var defaultEncodableSETAllowed: Bool { self == .basic }
 
-    @inlinable
+    
     var unsortedSETAllowed: Bool { self == .basic }
 
-    @inlinable
+    
     var unsortedSETOFAllowed: Bool { self == .basic }
 }
 
@@ -84,7 +84,7 @@ extension ASN1 {
         @usableFromInline
         var dataBytes: ArraySlice<UInt8>?
 
-        @inlinable
+        
         init(
             identifier: ASN1Identifier,
             depth: Int,
@@ -106,7 +106,7 @@ extension ASN1.ParserNode: Hashable {}
 extension ASN1.ParserNode: Sendable {}
 
 extension ASN1.ParserNode: CustomStringConvertible {
-    @inlinable
+    
     var description: String {
         return
             "ASN1.ParserNode(identifier: \(self.identifier), depth: \(self.depth), dataBytes: \(self.dataBytes?.count ?? 0))"
@@ -114,7 +114,7 @@ extension ASN1.ParserNode: CustomStringConvertible {
 }
 
 extension ASN1.ParserNode {
-    @inlinable
+    
     var isEndMarker: Bool {
         self.identifier.tagClass == .universal
             && self.identifier.tagNumber == 0
@@ -128,18 +128,18 @@ extension ASN1.ParserNode {
 extension ASN1 {
     @usableFromInline
     struct ParseResult: Sendable {
-        @inlinable
+        
         static var _maximumNodeDepth: Int { 50 }
 
         @usableFromInline
         var nodes: ArraySlice<ParserNode>
 
-        @inlinable
+        
         init(_ nodes: ArraySlice<ParserNode>) {
             self.nodes = nodes
         }
 
-        @inlinable
+        
         static func parse(_ data: ArraySlice<UInt8>, encoding rules: EncodingRules) throws -> ParseResult {
             var data = data
             var nodes = [ParserNode]()
@@ -151,7 +151,7 @@ extension ASN1 {
             return ParseResult(nodes[...])
         }
 
-        @inlinable
+        
         static func _parseNode(
             from data: inout ArraySlice<UInt8>,
             encoding rules: EncodingRules,
@@ -280,12 +280,12 @@ extension ASN1 {
             @usableFromInline
             var wrapped: WrappedSequence.Iterator
 
-            @inlinable
+            
             mutating public func next() -> Element? {
                 wrapped.next()
             }
 
-            @inlinable
+            
             init(_ wrapped: WrappedSequence.Iterator) {
                 self.wrapped = wrapped
             }
@@ -294,12 +294,12 @@ extension ASN1 {
         @usableFromInline
         var wrapped: WrappedSequence
 
-        @inlinable
+        
         init(_ wrapped: WrappedSequence) {
             self.wrapped = wrapped
         }
 
-        @inlinable
+        
         public func makeIterator() -> Iterator {
             .init(wrapped.makeIterator())
         }
@@ -324,7 +324,7 @@ public struct ASN1NodeCollection {
 
     @usableFromInline var _depth: Int
 
-    @inlinable
+    
     init(nodes: ArraySlice<ASN1.ParserNode>, depth: Int) {
         self._nodes = nodes
         self._depth = depth
@@ -349,13 +349,13 @@ extension ASN1NodeCollection: Sequence {
         @usableFromInline
         var _depth: Int
 
-        @inlinable
+        
         init(nodes: ArraySlice<ASN1.ParserNode>, depth: Int) {
             self._nodes = nodes
             self._depth = depth
         }
 
-        @inlinable
+        
         public mutating func next() -> ASN1Node? {
             guard let nextNode = self._nodes.popFirst() else {
                 return nil
@@ -381,7 +381,7 @@ extension ASN1NodeCollection: Sequence {
         }
     }
 
-    @inlinable
+    
     public func makeIterator() -> Iterator {
         return Iterator(nodes: self._nodes, depth: self._depth)
     }
@@ -408,7 +408,7 @@ public struct ASN1Node: Hashable, Sendable {
     /// This is principally intended for diagnostic purposes.
     public var encodedBytes: ArraySlice<UInt8>
 
-    @inlinable
+    
     internal init(
         identifier: ASN1Identifier,
         content: ASN1Node.Content,
@@ -441,7 +441,7 @@ extension ArraySlice where Element == UInt8 {
         case definite(_: UInt)
     }
 
-    @inlinable
+    
     mutating func _readASN1Length(_ minimalEncoding: Bool) throws -> ASN1Length? {
         guard let firstByte = self.popFirst() else {
             return nil
@@ -498,7 +498,7 @@ extension ArraySlice where Element == UInt8 {
 }
 
 extension FixedWidthInteger {
-    @inlinable
+    
     internal init<Bytes: Collection>(bigEndianBytes bytes: Bytes) throws where Bytes.Element == UInt8 {
         guard bytes.count <= (Self.bitWidth / 8) else {
             throw ASN1Error.invalidASN1Object(reason: "Unable to treat \(bytes.count) bytes as a \(Self.self)")
@@ -521,7 +521,7 @@ extension FixedWidthInteger {
 }
 
 extension Array where Element == UInt8 {
-    @inlinable
+    
     mutating func _moveRange(offset: Int, range: Range<Index>) {
         // We only bothered to implement this for positive offsets for now, the algorithm
         // generalises.
@@ -543,7 +543,7 @@ extension Array where Element == UInt8 {
 }
 
 extension Int {
-    @inlinable
+    
     var _bytesNeededToEncode: Int {
         // ASN.1 lengths are in two forms. If we can store the length in 7 bits, we should:
         // that requires only one byte. Otherwise, we need multiple bytes: work out how many,
@@ -561,7 +561,7 @@ extension Int {
 
 extension FixedWidthInteger {
     // Bytes needed to store a given integer.
-    @inlinable
+    
     internal var neededBytes: Int {
         let neededBits = self.bitWidth - self.leadingZeroBitCount
         return (neededBits + 7) / 8
@@ -569,7 +569,7 @@ extension FixedWidthInteger {
 }
 
 extension ASN1NodeCollection {
-    @inlinable
+    
     func isOrderedAccordingToSetOfSemantics() -> Bool {
         var iterator = self.makeIterator()
         guard let first = iterator.next() else {
@@ -588,7 +588,7 @@ extension ASN1NodeCollection {
     }
 }
 
-@inlinable
+
 func asn1SetElementLessThan(_ lhs: ArraySlice<UInt8>, _ rhs: ArraySlice<UInt8>) -> Bool {
     for (leftByte, rightByte) in zip(lhs, rhs) {
         if leftByte < rightByte {
@@ -610,7 +610,7 @@ func asn1SetElementLessThan(_ lhs: ArraySlice<UInt8>, _ rhs: ArraySlice<UInt8>) 
     return true
 }
 
-@inlinable
+
 func asn1SetElementLessThanOrEqual(_ lhs: ArraySlice<UInt8>, _ rhs: ArraySlice<UInt8>) -> Bool {
     // https://github.com/apple/swift/blob/43c5824be892967993f4d0111206764eceeffb67/stdlib/public/core/Comparable.swift#L202
     !asn1SetElementLessThan(rhs, lhs)
